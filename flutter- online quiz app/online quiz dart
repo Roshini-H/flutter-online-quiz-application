@@ -1,0 +1,140 @@
+import 'package:flutter/material.dart';
+import 'dart:math';
+
+void main() {
+  runApp(QuizApp());
+}
+
+class QuizApp extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'Simple Quiz App',
+      theme: ThemeData(
+        primarySwatch: Colors.blue,
+      ),
+      home: QuizHomePage(),
+    );
+  }
+}
+
+class QuizHomePage extends StatefulWidget {
+  @override
+  _QuizHomePageState createState() => _QuizHomePageState();
+}
+
+class _QuizHomePageState extends State<QuizHomePage> {
+  final List<Map<String, dynamic>> _questions = [
+    {
+      'question': 'What is the capital of France?',
+      'answers': ['Berlin', 'Madrid', 'Paris', 'Lisbon'],
+      'correctAnswer': 'Paris',
+    },
+    {
+      'question': 'What is 2 + 2?',
+      'answers': ['3', '4', '5', '6'],
+      'correctAnswer': '4',
+    },
+    {
+      'question': 'What is the largest planet in our solar system?',
+      'answers': ['Earth', 'Jupiter', 'Mars', 'Saturn'],
+      'correctAnswer': 'Jupiter',
+    },
+    {
+      'question': 'What is the chemical symbol for water?',
+      'answers': ['H2O', 'O2', 'CO2', 'NaCl'],
+      'correctAnswer': 'H2O',
+    },
+    {
+      'question': 'Who wrote "Romeo and Juliet"?',
+      'answers': ['Charles Dickens', 'Mark Twain', 'William Shakespeare', 'Jane Austen'],
+      'correctAnswer': 'William Shakespeare',
+    },
+  ];
+
+  int _currentQuestionIndex = 0;
+  int _score = 0;
+
+  // List of encouragement statements
+  final List<String> _encouragementStatements = [
+    "Great job!",
+    "Well done!",
+    "You're doing amazing!",
+    "Keep it up!",
+    "Fantastic work!",
+    "You're a star!",
+    "Awesome effort!",
+    "You nailed it!",
+    "Superb!",
+    "Keep shining!"
+  ];
+
+  void _answerQuestion(String answer) {
+    if (answer == _questions[_currentQuestionIndex]['correctAnswer']) {
+      _score++;
+    } else {
+      // Show encouragement for wrong answers
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(_getEncouragement()),
+        ),
+      );
+    }
+    setState(() {
+      _currentQuestionIndex++;
+    });
+  }
+
+  String _getEncouragement() {
+    // Randomly select an encouragement statement
+    final random = Random();
+    return _encouragementStatements[random.nextInt(_encouragementStatements.length)];
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Quiz App'),
+      ),
+      body: _currentQuestionIndex < _questions.length
+          ? Column(
+        children: [
+          Text(
+            _questions[_currentQuestionIndex]['question'],
+            style: TextStyle(fontSize: 24),
+          ),
+          ...(_questions[_currentQuestionIndex]['answers'] as List<String>)
+              .map((answer) {
+            return ElevatedButton(
+              onPressed: () => _answerQuestion(answer),
+              child: Text(answer),
+            );
+          }).toList(),
+        ],
+      )
+          : Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              'Your score: $_score/${_questions.length}',
+              style: TextStyle(fontSize: 24),
+            ),
+            SizedBox(height: 20),
+            if (_score == _questions.length)
+              Text(
+                'Perfect score! You got all answers right! 🎉',
+                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.green),
+              )
+            else
+              Text(
+                _getEncouragement(),
+                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+}
